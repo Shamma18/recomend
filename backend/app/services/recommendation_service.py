@@ -5,7 +5,7 @@ import requests
 # Your keys are intentionally left in this file as requested.
 PINECONE_API_KEY = "pcsk_3spAud_D66kNnQiYH4TF99hStEuThoSqjoingbaw7zXLRzRfPmvaXjurbpVMg38bdxU2gM"
 INDEX_HOST = "https://recomend-6c7pmst.svc.aped-4627-b74a.pinecone.io"
-HUGGING_FACE_TOKEN = "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"
+HUGGING_FACE_TOKEN = "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"
 
 
 # --- HUGGING FACE API SETUP ---
