@@ -1,0 +1,28 @@
+# Frontend .gitignore
+
+# Dependencies
+# This folder is huge and can be recreated by running `npm install`.
+# It's the single most important folder to ignore.
+/node_modules
+
+# Build output
+# This folder is created when you run `npm run build` for production.
+# You should always build this on the server, not commit it.
+/build
+
+# Environment variables
+# This file contains secret API keys and should NEVER be committed to Git.
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Create React App cache
+.npm
+.eslintcache
