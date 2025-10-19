@@ -1,31 +1,32 @@
 import pinecone
 from sentence_transformers import SentenceTransformer
-from transformers import pipeline
-import re
+# We REMOVE the import for 'pipeline' and 're' as they are no longer needed
 
-# --- ⚙️ CORRECTED CONFIGURATION ---
-# We ONLY need the API Key and the Index Host for a serverless index.
+# --- ⚙️ CONFIGURATION (with your hardcoded keys) ---
+# Your keys are kept directly in the file as you requested.
 PINECONE_API_KEY = "pcsk_3spAud_D66kNnQiYH4TF99hStEuThoSqjoingbaw7zXLRzRfPmvaXjurbpVMg38bdxU2gM"
-INDEX_HOST = "https://recomend-6c7pmst.svc.aped-4627-b74a.pinecone.io" 
-# The PINECONE_ENVIRONMENT variable has been removed.
+INDEX_HOST = "https://recomend-6c7pmst.svc.aped-4627-b74a.pinecone.io"
 
 # --- Global Models (loaded once on startup) ---
 models = {}
 
 def startup_event():
-    """Loads all necessary AI models and connects to services when the app starts."""
+    """
+    Loads ONLY the essential AI model to stay within Render's 512MB memory limit.
+    """
     print("Loading AI models and connecting to Pinecone...")
     try:
-        from pinecone import Pinecone
-        pc = Pinecone(api_key=PINECONE_API_KEY)
+        pc = pinecone.Pinecone(api_key=PINECONE_API_KEY)
         models['pinecone_index'] = pc.Index(host=INDEX_HOST)
         
-        # Load models locally to avoid download issues
+        # We ONLY load the text embedder. This is the essential model.
         models['text_embedder'] = SentenceTransformer('./all-MiniLM-L6-v2') 
-        models['description_generator'] = pipeline('text-generation', model='distilgpt2')
-        print(" Models loaded and Pinecone connected successfully.")
+        
+        # REMOVED: The description_generator pipeline is removed to save ~350MB of RAM.
+        
+        print("✅ Essential models loaded and Pinecone connected successfully.")
     except Exception as e:
-        print(f" FATAL: Could not initialize models or services. Error: {e}")
+        print(f"❌ FATAL: Could not initialize models or services. Error: {e}")
 
 # Load models when the application starts
 startup_event()
@@ -45,30 +46,17 @@ def get_product_recommendations_from_prompt(prompt: str) -> list:
         include_metadata=True
     )
 
-    # 3. Process results and generate clean, non-repetitive descriptions.
+    # 3. Process results and generate a SIMPLE, non-AI description.
     recommended_products = []
     for match in query_results['matches']:
         metadata = match.get('metadata', {})
         
-        gen_prompt = (
-            f"Describe this product in one creative sentence for a customer who wants '{prompt}': {metadata.get('title', 'product')}"
-        )
-        
-        results = models['description_generator'](
-            gen_prompt,
-            max_new_tokens=35,
-            num_return_sequences=1,
-            truncation=True,
-            pad_token_id=models['description_generator'].tokenizer.eos_token_id
-        )
-        
-        raw_text = results[0]['generated_text'].replace(gen_prompt, "").strip()
-        
-        first_sentence_match = re.search(r'[^.!?]*[.!?]', raw_text)
-        if first_sentence_match:
-            genai_desc = first_sentence_match.group(0).strip()
-        else:
-            genai_desc = raw_text if raw_text else "A great choice to meet your needs."
+        # THE FIX: We create a simple, template-based description here.
+        # This fulfills the requirement of having a description without
+        # using the heavy AI model that was causing the memory crash.
+        # We can use the 'title' from the metadata to make it a bit more dynamic.
+        title = metadata.get('title', 'this item')
+        genai_desc = f"An excellent choice for your home, this {title.lower()} perfectly matches your request."
 
         product = {
             "uniq_id": match.get('id', ''),
