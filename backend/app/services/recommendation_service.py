@@ -5,19 +5,16 @@ import requests
 # Your keys are intentionally left in this file as requested.
 PINECONE_API_KEY = "pcsk_3spAud_D66kNnQiYH4TF99hStEuThoSqjoingbaw7zXLRzRfPmvaXjurbpVMg38bdxU2gM"
 INDEX_HOST = "https://recomend-6c7pmst.svc.aped-4627-b74a.pinecone.io"
-HUGGING_FACE_TOKEN = "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"
+HUGGING_FACE_TOKEN = "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"
 
 
-# --- HUGGING FACE API SETUP ---
 API_URL = "https://api-inference.huggingface.co/pipeline/feature-extraction/sentence-transformers/all-MiniLM-L6-v2"
 headers = {"Authorization": f"Bearer {HUGGING_FACE_TOKEN}"}
 
 
-# --- Global Models (No local models loaded) ---
 models = {}
 
 def startup_event():
-    """Connects to Pinecone. Does NOT load any heavy AI models."""
     print("Connecting to Pinecone...")
     try:
         pc = pinecone.Pinecone(api_key=PINECONE_API_KEY)
@@ -29,12 +26,30 @@ def startup_event():
 startup_event()
 
 def get_embedding_from_api(text: str) -> list:
-    """Calls the Hugging Face API to get the vector embedding."""
-    response = requests.post(API_URL, headers=headers, json={"inputs": text, "options":{"wait_for_model":True}})
-    if response.status_code != 200:
-        print(f"Error from Hugging Face API: {response.text}")
+    """
+    This function calls the Hugging Face API to get the vector embedding.
+    """
+    try:
+        # --- THIS IS THE FIX ---
+        # We add a `timeout` of 15 seconds to the request.
+        # If the Hugging Face API doesn't respond within 15s, this will raise a Timeout exception
+        # instead of letting our server hang indefinitely.
+        response = requests.post(
+            API_URL,
+            headers=headers,
+            json={"inputs": text, "options": {"wait_for_model": True}},
+            timeout=15
+        )
+        response.raise_for_status() # This will raise an HTTPError for bad responses (4xx or 5xx)
+        return response.json()[0]
+    
+    except requests.exceptions.Timeout:
+        print("Error: Hugging Face API call timed out after 15 seconds.")
+        raise ConnectionError("The embedding service took too long to respond.")
+    except requests.exceptions.RequestException as e:
+        print(f"Error from Hugging Face API: {e}")
         raise ConnectionError("Failed to get embedding from Hugging Face API.")
-    return response.json()[0]
+
 
 def get_product_recommendations_from_prompt(prompt: str) -> list:
     """Gets recommendations by calling the embedding API and querying Pinecone."""

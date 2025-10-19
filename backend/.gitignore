@@ -26,8 +26,8 @@ __pycache__/
 # It is best practice to NOT commit large data files to Git.
 # If your CSV files are small (< 5MB), you can optionally remove these lines.
 # But for larger projects, always ignore data files.
-data/cleaned_products.csv
-data/intern_data_ikarus.csv
+# # data/cleaned_products.csv
+# data/intern_data_ikarus.csv
 
 # Downloaded model files
 # If you downloaded the model manually, ignore that folder.
