@@ -2,15 +2,6 @@ fastapi
 uvicorn[standard]
 pydantic
 pandas
-pinecone==3.2.2  # Use the correct, modern library
-sentence-transformers
-transformers[torch]
-torch
-Pillow
+pinecone==3.2.2
 requests
-jupyter
-matplotlib
-seaborn
-tqdm
-ipykernel
 gunicorn
