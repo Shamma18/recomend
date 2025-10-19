@@ -1,0 +1,34 @@
+# Backend .gitignore
+
+# Virtual Environment
+# This is the Python equivalent of node_modules. It contains all installed
+# libraries and can be recreated using `pip install -r requirements.txt`.
+/venv
+/env
+/.venv
+
+# Python cache files
+# These are compiled Python files that are generated automatically.
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Environment variables
+# This file contains your secret Pinecone keys and should NEVER be committed.
+.env
+
+# Jupyter Notebook checkpoints
+# These are temporary auto-saves from Jupyter and clutter the repository.
+.ipynb_checkpoints/
+
+# Data Files
+# It is best practice to NOT commit large data files to Git.
+# If your CSV files are small (< 5MB), you can optionally remove these lines.
+# But for larger projects, always ignore data files.
+data/cleaned_products.csv
+data/intern_data_ikarus.csv
+
+# Downloaded model files
+# If you downloaded the model manually, ignore that folder.
+/all-MiniLM-L6-v2/

@@ -1,0 +1,14 @@
+# Root .gitignore
+
+# Operating System generated files
+.DS_Store
+Thumbs.db
+
+# IDE and code editor configuration files
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Log files
+*.log
