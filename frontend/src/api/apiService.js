@@ -1,9 +1,8 @@
 import axios from "axios";
 
 const apiClient = axios.create({
-  // ⬇️ THIS IS THE MOST IMPORTANT CHANGE ⬇️
-  // Replace the localhost URL with your live Render backend URL
-  baseURL: "https://recomend-backend.onrender.comk",
+  // This is the corrected URL for your live backend.
+  baseURL: "https://recomend-backend.onrender.com/api",
 
   headers: {
     "Content-Type": "application/json",
